@@ -13,6 +13,8 @@ func SetApiRouter(router *gin.Engine) {
 	apiRouter.Use(gzip.Gzip(gzip.DefaultCompression))
 	apiRouter.Use(middleware.GlobalAPIRateLimit())
 	{
+		apiRouter.POST("/wxpay/callback", controller.WXPayCB)
+		apiRouter.POST("/v1/wxpay/callback", controller.WXPayCB)
 		apiRouter.GET("/status", controller.GetStatus)
 		apiRouter.GET("/notice", controller.GetNotice)
 		apiRouter.GET("/about", controller.GetAbout)
@@ -41,6 +43,9 @@ func SetApiRouter(router *gin.Engine) {
 				selfRoute.GET("/token", controller.GenerateAccessToken)
 				selfRoute.GET("/aff", controller.GetAffCode)
 				selfRoute.POST("/topup", controller.TopUp)
+				selfRoute.GET("/topup_pay", controller.TopUpPay)
+				selfRoute.POST("/query_order", controller.QueryOrder)
+				selfRoute.GET("/goods_info", controller.GoodsInfo)
 			}
 
 			adminRoute := userRoute.Group("/")

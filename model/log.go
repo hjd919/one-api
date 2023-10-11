@@ -28,6 +28,7 @@ const (
 	LogTypeConsume
 	LogTypeManage
 	LogTypeSystem
+	LogTypeTopupWX
 )
 
 func RecordLog(userId int, logType int, content string) {
