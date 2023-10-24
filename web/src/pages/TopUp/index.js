@@ -147,7 +147,7 @@ const TopUp = () => {
           <Form>
             <Segment>
               {goodsInfo.map((item, index) =>
-                  <Button color={index==0?'red':'green'} onClick={(e)=>toWXpay(item.money)}>
+                  <Button color={index===0?'red':'green'} onClick={(e)=>toWXpay(item.money)}>
                     {item.money/100}元（{renderQuota(item.quota)}）
                   </Button>
               )}
