@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Form, Grid, Header, Segment, Statistic,Image } from 'semantic-ui-react';
+import { Button, Form, Grid, Header, Segment, Statistic,Image,Select } from 'semantic-ui-react';
 import { API, showError, showInfo, showSuccess } from '../../helpers';
 import { renderQuota } from '../../helpers/render';
 
@@ -9,6 +9,7 @@ const TopUp = () => {
   const [qrcodeUrl, setQrcodeUrl] = useState('');
   const [selectedMoney, setSelectedMoney] = useState(0);
   const [userQuota, setUserQuota] = useState(0);
+  const [userMoney, setUserMoney] = useState(0);
   const [goodsInfo, setGoodsInfo] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -34,6 +35,7 @@ const TopUp = () => {
         });
         if (data > 0){
           setQrcodeUrl('');
+          setUserMoney(0);
         }
       } else {
         showError(message);
@@ -89,15 +91,26 @@ const TopUp = () => {
       showError(message);
     }
   }
-
+  var moneyQuota = {}
   const getGoodsInfo = async () => {
     let res  = await API.get(`/api/user/goods_info`);
     const {success, message, data} = res.data;
     if (success) {
-      setGoodsInfo(data);
+        var options = []
+        data.map((item,index) =>{
+            let goodsItem = { key: index, text: item.desc, value: item.money }
+            options.push(goodsItem)
+            moneyQuota[item.money] = item.quota
+        })
+        setGoodsInfo(options);
     } else {
       showError(message);
     }
+  }
+
+  const handleChangeMoney = (e,{value}) => {
+    setUserMoney(value)
+    toWXpay(value)
   }
 
   useEffect(() => {
@@ -114,6 +127,7 @@ const TopUp = () => {
   }, []);
 
   return (
+  <>
     <Segment>
         <Header as='h3'>平台价格</Header>
         <p>
@@ -141,33 +155,6 @@ const TopUp = () => {
                 {isSubmitting ? '兑换中...' : '兑换'}
             </Button>
           </Form>
-          <Header as='h3'>
-            微信充值
-          </Header>
-          <Form>
-            <Segment>
-              {goodsInfo.map((item, index) =>
-                  <Button color={index===0?'red':'green'} onClick={(e)=>toWXpay(item.money)}>
-                    {item.money/100}元（{renderQuota(item.quota)}）
-                  </Button>
-              )}
-            </Segment>
-            {
-              qrcodeUrl !=="" && (
-                <Segment>
-                  <Segment>
-                    <Image src={qrcodeUrl} size='medium' centered/>
-                    <Header as='h4' textAlign='center'>{selectedMoney/100}元</Header>
-                  </Segment>
-                  <Segment>
-                    <Button color='blue' onClick={(e)=>queryOrder(e)}>
-                      查询支付结果
-                    </Button>
-                  </Segment>
-                </Segment>
-              )
-            }
-          </Form>
         </Grid.Column>
         <Grid.Column>
           <Statistic.Group widths='one'>
@@ -179,6 +166,47 @@ const TopUp = () => {
         </Grid.Column>
       </Grid>
     </Segment>
+    <Segment>
+          <Grid columns={2} stackable>
+            <Grid.Column>
+              <Header as='h3'>
+                在线充值，最低1 (单位: $)
+              </Header>
+              <Form>
+                <Form.Field
+                  control={Select}
+                  options={goodsInfo}
+                  onChange={handleChangeMoney}
+                  placeholder='充值金额，请选择'
+                />
+                {
+                  qrcodeUrl !=="" && (
+                    <Segment>
+                      <Segment>
+                        <Image src={qrcodeUrl} size='medium' centered/>
+                       <Header as='h3' textAlign='center'>{selectedMoney/100}元</Header>
+                      </Segment>
+                      <Segment>
+                        <Button color='blue' onClick={(e)=>queryOrder(e)}>
+                          查询支付结果
+                        </Button>
+                      </Segment>
+                    </Segment>
+                  )
+                }
+              </Form>
+            </Grid.Column>
+            <Grid.Column>
+              <Statistic.Group widths='one'>
+                <Statistic>
+                  <Statistic.Value>{userMoney/100}元</Statistic.Value>
+                  <Statistic.Label>支付金额</Statistic.Label>
+                </Statistic>
+              </Statistic.Group>
+            </Grid.Column>
+          </Grid>
+        </Segment>
+    </>
   );
 };
 

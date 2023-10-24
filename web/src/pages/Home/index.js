@@ -1,5 +1,4 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Card, Grid, Header, Segment } from 'semantic-ui-react';
 import { API, showError, showNotice, timestamp2string } from '../../helpers';
 import { StatusContext } from '../../context/Status';
 import { marked } from 'marked';

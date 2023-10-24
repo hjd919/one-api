@@ -15,8 +15,9 @@ type topUpPayRequest struct {
 }
 
 type Goods struct {
-	Money int64 `json:"money"`
-	Quota int   `json:"quota"`
+	Money int64  `json:"money"`
+	Quota int    `json:"quota"`
+	Desc  string `json:"desc"`
 }
 
 var GoodsInfoData []Goods
