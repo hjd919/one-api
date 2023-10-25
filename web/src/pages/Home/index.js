@@ -48,7 +48,8 @@ const Home = () => {
 
   useEffect(() => {
     displayNotice().then();
-    displayHomePageContent().then();
+    setHomePageContentLoaded(true);
+    // displayHomePageContent().then();
   }, []);
   return (
     <>
